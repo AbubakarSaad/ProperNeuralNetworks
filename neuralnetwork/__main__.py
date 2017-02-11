@@ -20,12 +20,32 @@ def main():
     random_file_num = np.random.randint(10, 20)
     print(random_file_num)
 
-    path = filepath + dirlisting[random_file_num]
-    inputs = np.loadtxt(path, delimiter=',', dtype='float')
+    # path = filepath + dirlisting[random_file_num]
+    # inputs = np.loadtxt(path, delimiter=',', dtype='float')
+    inputs = []
     # print(inputs[0])
+    for i in range(10, len(dirlisting)): 
+        path = filepath + dirlisting[i]
+        inp = np.loadtxt(path, delimiter=',', dtype='float')
+        for j in range(len(inp)):
+            inputs.append(inp[j])
 
-    feedfor = FeedForward(64, inputs[0])
-    feedfor.feedforward()
+    # k-fold cross validation
+
+    data = inputs
+    print(inputs[0])
+    track = [i for i in range(0, len(inputs))]
+    input_data = list(zip(data, track))
+
+    np.random.shuffle(input_data)
+    data, track = zip(*input_data)
+
+    print(data[0])
+    print(track[0])
+
+
+    # feedfor = FeedForward(64, inputs[0])
+    # feedfor.feedforward()
 
 if __name__ == "__main__":
     main()

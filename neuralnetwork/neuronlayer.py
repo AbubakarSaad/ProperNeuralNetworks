@@ -19,4 +19,4 @@ class NeuronLayer(object):
 
     # random bais for each neuron in a layer between 0 to 1 (but not including 1)
     def biasforeach(self, size):
-        return np.random.rand(size)
+        return  np.random.uniform(-0.5, 0.5, size=size)

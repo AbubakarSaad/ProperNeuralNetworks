@@ -51,11 +51,10 @@ class FeedForward(object):
 
         # feed it to the activationfunction and list is used to print out the values (outputlayer)
         activationfunctionofo = list(map(Functions().sigmoid, sumo))
-        print('activationfunction of outputlayer: \n', activationfunctionofo)
+        print('activationfunction of outputlayer y: \n', activationfunctionofo)
 
 
         # global error = add local error of output layer
-        print(np.sum(activationfunctionofo))
 
 
 
