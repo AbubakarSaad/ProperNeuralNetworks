@@ -4,29 +4,38 @@ import numpy as np
 class Backprop(object):
 
 
-    def __init__(self, outputsofo, outputofh, error, weightsofHtoO):
-        self.outputsfeed = outputsofo
-        self.outputofh = outputofh
-        self.error = error
-        self.weightofHtoO = weightsofHtoO
+    def __init__(self):
+        pass
 
-
-    def backpropagation(self):
+    def backpropagation(self, outputsofo, outputofh, error, weightsofHtoO, learningRate, sample, weightsofItoH):
         # local error at output 
-        localerrorofO = list(map(Functions().derSigmoid, self.outputsfeed))
-        print("local error at the output layer", localerrorofO)
-        print("self_error", self.error, localerrorofO)
-
-        # dj
-        erroratoutputlayer = np.multiply(localerrorofO, self.error)
-        print("error at the output layer", erroratoutputlayer)
-
+        self.weightsOfHtoO = weightsofHtoO
+        self.weightsOfItoH = weightsofItoH
+        outo1neto1 = list(map(Functions().derSigmoid, outputsofo))
+        # rate of change at output layer
+        erroratoutputlayer = np.multiply(outo1neto1, error)
+        self.deltaArrayOutput = np.zeros((len(weightsofHtoO), len(weightsofHtoO[0])))
+        for i in range(len(weightsofHtoO[0])):
+            for j in range(len(weightsofHtoO)):
+                delta = erroratoutputlayer[i]*outputofh[j]*learningRate
+                self.weightsOfHtoO[j][i] -= delta
+                self.deltaArrayOutput[j][i] = delta
+        
         # calucate the error at the hidden layer
-        errorathiddenlayer = Functions().dotproduct(self.weightofHtoO, np.matrix.transpose(erroratoutputlayer))
-        # print(np.reshape(erroratoutputlayer, (-1, 1)))
-        print('error at hidden layer', errorathiddenlayer)
+        errorContr = np.dot(np.matrix.transpose(weightsofHtoO), erroratoutputlayer)
+        bi = list(map(Functions().derSigmoid, outputofh))
+        errorHiddenLayer = np.multiply(errorContr, bi)
+        # print('error ', errorHiddenLayer)
+        self.deltaArrayHidden = np.zeros((len(weightsofItoH), len(weightsofItoH[0])))
+        # print(len(weightsofItoH), len(weightsofItoH[0]))
+        for i in range(len(weightsofItoH[0])):
+            for j in range(len(weightsofItoH)):
+                delta = errorHiddenLayer[i] * sample[j] * learningRate
+                self.weightsOfItoH[j][i] -= delta
+                self.deltaArrayHidden[j][i] = delta
 
-        print('output of the hidden layer', self.outputofh)
-        # ei = bi(1 - bi)sum(wij*dj)
-        errorHiddenLayer = np.multiply(list(map(Functions().derSigmoid, self.outputofh)), errorathiddenlayer)
-        print('ei of the hidden layer', errorHiddenLayer)
+    def getOutputLayerError(self):
+        return self.weightsOfHtoO
+    
+    def getHiddenLayerError(self):
+        return self.weightsOfItoH
