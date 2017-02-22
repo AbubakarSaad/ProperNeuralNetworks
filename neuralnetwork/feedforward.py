@@ -4,17 +4,15 @@ import numpy as np
 
 class FeedForward(object):
 
-    def __init__(self, weightsforh, weightsforo, sizeofBaish, sizeofBaiso):
+    def __init__(self, weightsforh, weightsforo, baish, baiso):
         # self.hiddenlayer = NeuronLayer('hidden')
         self.weightconnectionh = weightsforh # weights for hidden layer
         # self.outputlayer = NeuronLayer('output')
         self.weightconnectiono = weightsforo # weights for output layer
-        self.sizeofBaish = sizeofBaish
-        self.sizeofBaiso = sizeofBaiso
         # bais to add to the summation of input and weights
-        self.baish = np.random.uniform(-0.5, 0.5, size=self.sizeofBaish)
+        self.baish = baish
         # bais for output layer
-        self.baiso = np.random.uniform(-0.5, 0.5, size=self.sizeofBaiso)
+        self.baiso = baiso
 
     def feedforward(self, inputs):
         inputlayer = inputs
