@@ -13,11 +13,11 @@ from functions import Functions
 
 def main():
 
-    learningRate = 0.05
-    momentum = 0.01
-    epoch = 200
+    learningRate = 0.3
+    momentum = 0.1
+    epoch = 100
     weightconnectionstoH = 64
-    numberofHiddenNeuron = 25
+    numberofHiddenNeuron = 40
     numberofOutputNeuron = 10 
     sizeofBaish = numberofHiddenNeuron
     sizeofBaiso = numberofOutputNeuron
@@ -55,7 +55,7 @@ def main():
     biaso = np.random.uniform(-0.5, 0.5, size=sizeofBaiso)
 
     feedfor = FeedForward(weightsforh, weightsforo, biash, biaso)
-    backprop = Backprop(biash, biaso, momentum)
+    backprop = Backprop(biash, biaso, momentum, weightsforo, weightsforh)
     # epochs
     for fe in range(epoch):
         print('\nEpoch number: ', fe)
@@ -86,23 +86,8 @@ def main():
                 if digit == excepted:
                     accuracy += 1
 
-            # if e == len(data) - 1:
-            #     lastInput = list(Functions().getIncdices(trackId)).index(1)
-            #     print('Max value for each output:', np.amax(feedforwardoutput))
-            #     print('index of Max Value', list(feedforwardoutput).index(np.amax(feedforwardoutput)))
-            
-                # print(list(Functions().getIncdices(trackId)).index(1))
-        # print(len(data))
-        # for u in range(numberofOutputNeuron):
-        #     err = np.subtract(Functions().getErrorResult(u), feedforwardoutput)
-        #     globalError = 0.5*(np.sum((err) ** 2))
-        #     print("Number: ", u)
-        #     print("Error in the system: ", globalError)
-        
-        # print('Output layer: \n', feedforwardoutput)
-        # print('Digit: ', lastInput)
-        # err = np.subtract(Functions().getErrorResult(lastInput), feedforwardoutput)
         # print("Error in the system: ", 0.5*(np.sum((err) ** 2)))
+        # 
         print("accuracy of the system: ", (accuracy/len(data)), "%", accuracy)
         
 

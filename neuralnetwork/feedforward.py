@@ -19,17 +19,17 @@ class FeedForward(object):
 
         # dotproduct for summtation of input times the weight (inputlayer to hiddenlayer)
         dotproducth = np.dot(inputlayer, self.weightconnectionh)
-        sumh = np.add(dotproducth, self.baish)
+        sumh = dotproducth + self.baish
         
         # feed it to the activationfunction and list is used to print out the values
-        self.outputofhs = list(map(Functions().sigmoid, sumh))
+        self.outputofhs = Functions().sigmoid(sumh) 
 
         # dotproduct for summation of the hiddenlayer and weights (hiddenlayer to outputlayer)
         dotproducto = np.dot(self.outputofhs, self.weightconnectiono)
-        sumo = np.add(dotproducto, self.baiso)
+        sumo = dotproducto + self.baiso
         
         # feed it to the activationfunction and list is used to print out the values (outputlayer)
-        self.outputofos = list(map(Functions().sigmoid, sumo))
+        self.outputofos = Functions().sigmoid(sumo)
         
 
     def getOutputofHiddenLayer(self):

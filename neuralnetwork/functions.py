@@ -6,16 +6,13 @@ class Functions():
     def dotproduct(self, inputs, weights):
         return np.dot(inputs, weights)
 
-    def sigmoid(self, x):
-        return 1/(1 + math.exp(-(x)))
+    def sigmoid(self, x, derv=False):
+        if derv == True:
+            return x * (1 - x)
+        return 1/(1 + np.exp(-(x)))
 
     def tanh(self, x):
-        return (math.exp(x) - math.exp(-x))/(math.exp(x) + math.exp(-x))
-    
-    # o is actual output (actual output)
-    # t is expected output (target) 
-    def derSigmoid(self, x):
-        return x * (1 - x)
+        return (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
 
     def getIncdices(self, id):
         if math.floor(id / 700) == 0:

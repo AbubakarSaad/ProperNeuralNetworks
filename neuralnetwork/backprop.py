@@ -4,50 +4,75 @@ import numpy as np
 class Backprop(object):
 
 
-    def __init__(self, biash, biaso, momentum):
+    def __init__(self, biash, biaso, momentum, weightsofHtoO, weightsofItoH):
         self.biash = biash
         self.biaso = biaso
         self.momentum = momentum
+        self.deltaArrayOutput = np.zeros((len(weightsofHtoO), len(weightsofHtoO[0])))
+        self.deltabiaso = np.zeros(len(self.biaso))
+        self.weightsOfHtoO = weightsofHtoO
+        self.deltabiash = np.zeros(len(self.biash))
+        self.deltaArrayHidden = np.zeros((len(weightsofItoH), len(weightsofItoH[0])))
+        self.weightsOfItoH = weightsofItoH        
 
     def backpropagation(self, outputsofo, outputofh, error, weightsofHtoO, learningRate, sample, weightsofItoH):
         # local error at output 
-        self.weightsOfHtoO = weightsofHtoO
-        self.weightsOfItoH = weightsofItoH
-        outo1neto1 = list(map(Functions().derSigmoid, outputsofo))
-        # rate of change at output layer
+        
+        outo1neto1 = Functions().sigmoid(outputsofo, True)
         erroratoutputlayer = np.multiply(outo1neto1, error)
-        self.deltaArrayOutput = np.zeros((len(weightsofHtoO), len(weightsofHtoO[0])))
-        for i in range(len(weightsofHtoO[0])):
-            for j in range(len(weightsofHtoO)):
-                delta = erroratoutputlayer[i]*outputofh[j]*learningRate
-                self.weightsOfHtoO[j][i] -= (delta + self.deltaArrayOutput[j][i] * self.momentum)
-                self.deltaArrayOutput[j][i] = delta
+        
+        
+        erroutputlayer = np.reshape(erroratoutputlayer, (-1, 1))
+        tempOutputofh = np.resize(outputofh, (1,len(outputofh)))
+        delta = learningRate * np.dot(erroutputlayer, tempOutputofh).T
+        deltaMomentum = self.momentum * self.deltaArrayOutput
+        self.weightsOfHtoO -= (delta + deltaMomentum)
+        self.deltaArrayOutput = delta
+        
+        # print('deltaAarrayoutput', self.deltaArrayOutput)
+        # for i in range(len(weightsofHtoO[0])):
+        #     for j in range(len(weightsofHtoO)):
+        #         delta = erroratoutputlayer[i]*outputofh[j]*learningRate
+        #         self.weightsOfHtoO[j][i] -= (delta + self.deltaArrayOutput[j][i] * self.momentum)
+        #         self.deltaArrayOutput[j][i] = delta
+        
+
+        delta = learningRate * erroratoutputlayer
+        self.biaso -= delta
+        self.deltabiaso = delta
         # updating the bias
-        self.deltabiaso = np.zeros(len(self.biaso))
-        for i in range(len(self.biaso)):
-            delta = learningRate * erroratoutputlayer[i]
-            self.biaso[i] -= delta
-            self.deltabiaso = delta
+        # for i in range(len(self.biaso)):
+        #     delta = learningRate * erroratoutputlayer[i]
+        #     self.biaso[i] -= delta
+        #     self.deltabiaso = delta
 
         # calucate the error at the hidden layer
         errorContr = np.dot(erroratoutputlayer, np.matrix.transpose(weightsofHtoO))
-        bi = list(map(Functions().derSigmoid, outputofh))
+        bi = Functions().sigmoid(outputofh, True)
         errorHiddenLayer = np.multiply(errorContr, bi)
-        # print('error ', errorHiddenLayer)
-        self.deltaArrayHidden = np.zeros((len(weightsofItoH), len(weightsofItoH[0])))
+
+        
+        errHiddenLayer = np.reshape(errorHiddenLayer, (-1, 1))
+        tempSample = np.resize(sample, (1, len(sample)))
+        deltah = learningRate * np.dot(errHiddenLayer, tempSample).T
+        deltaMomentumh = self.momentum * self.deltaArrayHidden
+        self.weightsOfItoH -= (deltah + deltaMomentumh)
+        self.deltaArrayHidden = deltah
         # print(len(weightsofItoH), len(weightsofItoH[0]))
-        for i in range(len(weightsofItoH[0])):
-            for j in range(len(weightsofItoH)):
-                delta = errorHiddenLayer[i] * sample[j] * learningRate
-                self.weightsOfItoH[j][i] -= (delta + self.deltaArrayHidden[j][i] * self.momentum)
-                self.deltaArrayHidden[j][i] = delta
+        # for i in range(len(weightsofItoH[0])):
+        #     for j in range(len(weightsofItoH)):
+        #         delta = errorHiddenLayer[i] * sample[j] * learningRate
+        #         self.weightsOfItoH[j][i] -= (delta + self.deltaArrayHidden[j][i] * self.momentum)
+        #         self.deltaArrayHidden[j][i] = delta
         
         # updating the bias
-        self.deltabiash = np.zeros(len(self.biash))
-        for i in range(len(self.biash)):
-            delta = learningRate * errorHiddenLayer[i]
-            self.biash[i] -= delta
-            self.deltabiash = delta
+        delta = learningRate * errorHiddenLayer
+        self.biash -= delta
+        self.deltabiash = delta
+        # for i in range(len(self.biash)):
+        #     delta = learningRate * errorHiddenLayer[i]
+        #     self.biash[i] -= delta
+        #     self.deltabiash = delta
     
     def getOutputLayerError(self):
         return self.weightsOfHtoO
