@@ -24,10 +24,10 @@ class Backprop(object):
         
         erroutputlayer = np.reshape(erroratoutputlayer, (-1, 1))
         tempOutputofh = np.resize(outputofh, (1,len(outputofh)))
-        delta = learningRate * np.dot(erroutputlayer, tempOutputofh).T
+        deltao = learningRate * np.dot(erroutputlayer, tempOutputofh).T
         deltaMomentum = self.momentum * self.deltaArrayOutput
-        self.weightsOfHtoO -= (delta + deltaMomentum)
-        self.deltaArrayOutput = delta
+        self.weightsOfHtoO -= (deltao + deltaMomentum)
+        self.deltaArrayOutput = deltao
         
         # print('deltaAarrayoutput', self.deltaArrayOutput)
         # for i in range(len(weightsofHtoO[0])):
@@ -37,9 +37,9 @@ class Backprop(object):
         #         self.deltaArrayOutput[j][i] = delta
         
 
-        delta = learningRate * erroratoutputlayer
-        self.biaso -= delta
-        self.deltabiaso = delta
+        deltaob = learningRate * erroratoutputlayer
+        self.biaso -= deltaob
+        self.deltabiaso = deltaob
         # updating the bias
         # for i in range(len(self.biaso)):
         #     delta = learningRate * erroratoutputlayer[i]
@@ -66,9 +66,9 @@ class Backprop(object):
         #         self.deltaArrayHidden[j][i] = delta
         
         # updating the bias
-        delta = learningRate * errorHiddenLayer
-        self.biash -= delta
-        self.deltabiash = delta
+        deltaoh = learningRate * errorHiddenLayer
+        self.biash -= deltaoh
+        self.deltabiash = deltaoh
         # for i in range(len(self.biash)):
         #     delta = learningRate * errorHiddenLayer[i]
         #     self.biash[i] -= delta
