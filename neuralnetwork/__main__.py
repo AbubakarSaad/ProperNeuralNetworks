@@ -2,7 +2,7 @@ import numpy as np
 import os as os
 import math
 from feedforward import FeedForward
-from rprop import Rprop
+from deltabardelta import Deltabar
 from functions import Functions
 
 
@@ -10,7 +10,7 @@ def main():
 
     # learningRate = 0.1
     # momentum = 0.01
-    epoch = 100
+    epoch = 200
     weightconnectionstoH = 64
     numberofHiddenNeuron = 30
     numberofOutputNeuron = 10 
@@ -19,6 +19,13 @@ def main():
     # k = 10
     npos = 1.2
     nneg = 0.5
+    D = 0.20 # decay
+    K = 0.0001 # growth
+
+    # initialLR = 0.0005
+    # maxLearningRate = .001
+    # weight decay = 0.2
+    # weigthgrwoth = 0.0001
 
     # opening a file
     # os.path.dirname gets the dir path for this file
@@ -69,14 +76,15 @@ def main():
     # Input to hidden Layer
     currGradientItoH = np.zeros((len(weightsforitoh), len(weightsforitoh[0])))
     prevGradientItoH = np.zeros((len(weightsforitoh), len(weightsforitoh[0])))
-    initWeightItoH = np.ones((len(weightsforitoh), len(weightsforitoh[0]))) * 0.1
+    learingRateItoH = np.ones((len(weightsforitoh), len(weightsforitoh[0]))) * 0.0005
 
     # Hidden to Output Layers
     currGradientHtoO = np.zeros((len(weightsforhtoO), len(weightsforhtoO[0])))
     prevGradientHtoO = np.zeros((len(weightsforhtoO), len(weightsforhtoO[0])))
-    initWeightHtoO = np.ones((len(weightsforhtoO), len(weightsforhtoO[0]))) * 0.1
+    learingRateHtoO = np.ones((len(weightsforhtoO), len(weightsforhtoO[0]))) * 0.0005
 
-    rprop = Rprop(currGradientHtoO, currGradientItoH)
+
+    deltabar_delta = Deltabar(currGradientHtoO, currGradientItoH, learingRateItoH, learingRateHtoO)
     # epochs
     for fe in range(epoch):
         print('\nEpoch number: ', fe)
@@ -95,19 +103,19 @@ def main():
             indices = Functions().getIncdices(trackId)
             errorofoutputofo = feedforwardoutput - indices
             
-            rprop.Respropagation(feedforwardoutput, outputofh, errorofoutputofo, weightsforhtoO, data[e])
+            deltabar_delta.Deltabardelta(feedforwardoutput, outputofh, errorofoutputofo, weightsforhtoO, data[e])
             
-            currGradientHtoO += rprop.getGradientHtoO()
-            currGradientItoH += rprop.getGradientItoH()
+            currGradientHtoO += deltabar_delta.getGradientHtoO()
+            currGradientItoH += deltabar_delta.getGradientItoH()
 
             maxValue = np.amax(feedforwardoutput)
-            digit = list(feedforwardoutput[0]).index(maxValue)
+            digit = list(feedforwardoutput).index(maxValue)
             excepted = list(Functions().getIncdices(trackId)).index(1)
             if maxValue > 0.5000000000000: 
                 if digit == excepted:
                     accuracy += 1
         
-        # RProp starts here
+        # Deltabar Delta starts here
         # currGradientHtoO = rprop.getGradientHtoO()
         # print(currGradientItoH)
         # currGradientItoH = rprop.getGradientItoH()
@@ -117,17 +125,18 @@ def main():
                 # if they in the same direction
                 # multiple delta by 1.2
                 if((currGradientItoH[n][m] < 0 and prevGradientItoH[n][m] < 0) or (currGradientItoH[n][m] > 0 and prevGradientItoH[n][m] > 0)):
-                    initWeightItoH[n][m] = initWeightItoH[n][m] * npos
+                    learingRateItoH[n][m] = learingRateItoH[n][m] + K
                 elif((currGradientItoH[n][m] < 0 and prevGradientItoH[n][m] > 0) or (currGradientItoH[n][m] > 0 and prevGradientItoH[n][m] < 0)):
-                    initWeightItoH[n][m] = initWeightItoH[n][m] * nneg
+                    learingRateItoH[n][m] = learingRateItoH[n][m] * (1 - D)
                     # currGradientItoH[n][m] = 0
-                else:
-                    weightsforitoh[n][m] = weightsforitoh[n][m]
+                # else:
+                #     weightsforitoh[n][m] = weightsforitoh[n][m]
 
-                if(currGradientItoH[n][m] > 0):
-                    weightsforitoh[n][m] = weightsforitoh[n][m] - initWeightItoH[n][m]
-                elif(currGradientItoH[n][m] < 0):
-                    weightsforitoh[n][m] = weightsforitoh[n][m] + initWeightItoH[n][m]
+                weightsforitoh[n][m] = weightsforitoh[n][m] - (currGradientItoH[n][m] * learingRateItoH[n][m])
+                # if(currGradientItoH[n][m] > 0):
+                #     weightsforitoh[n][m] = weightsforitoh[n][m] - currGradientItoH[n][m]
+                # elif(currGradientItoH[n][m] < 0):
+                #     weightsforitoh[n][m] = weightsforitoh[n][m] + currGradientItoH[n][m]
                 # else:
                 #     weightsforitoh[n][m] = weightsforitoh[n][m]
         
@@ -136,17 +145,18 @@ def main():
             for p in range(len(weightsforhtoO[o])):
 
                 if((currGradientHtoO[o][p] < 0 and prevGradientHtoO[o][p] < 0) or (currGradientHtoO[o][p] > 0 and prevGradientHtoO[o][p] > 0)):
-                    initWeightHtoO[o][p] = initWeightHtoO[o][p] * npos
+                    learingRateHtoO[o][p] = learingRateHtoO[o][p] + K
                 elif((currGradientHtoO[o][p] < 0 and prevGradientHtoO[o][p] > 0) or (currGradientHtoO[o][p] > 0 and prevGradientHtoO[o][p] < 0)):
-                    initWeightHtoO[o][p] = initWeightHtoO[o][p] * nneg
+                    learingRateHtoO[o][p] = learingRateHtoO[o][p] * (1 - D)
                     # currGradientHtoO[o][p] = 0
-                else:
-                    weightsforhtoO[o][p] = weightsforhtoO[o][p]
+                # else:
+                #     weightsforhtoO[o][p] = weightsforhtoO[o][p]
 
-                if(currGradientHtoO[o][p] > 0):
-                    weightsforhtoO[o][p] = weightsforhtoO[o][p] - initWeightHtoO[o][p]
-                elif(currGradientHtoO[o][p] < 0):
-                    weightsforhtoO[o][p] = weightsforhtoO[o][p] + initWeightHtoO[o][p]
+                weightsforhtoO[o][p] = weightsforhtoO[o][p] - (currGradientHtoO[o][p] * learingRateHtoO[o][p])
+                # if(currGradientHtoO[o][p] > 0):
+                #     weightsforhtoO[o][p] = weightsforhtoO[o][p] - currGradientHtoO[o][p] 
+                # elif(currGradientHtoO[o][p] < 0):
+                #     weightsforhtoO[o][p] = weightsforhtoO[o][p] + currGradientHtoO[o][p]
                 # else:
                 #     weightsforhtoO[o][p] = weightsforhtoO[o][p]
 
@@ -156,28 +166,28 @@ def main():
         currGradientItoH = np.zeros((len(weightsforitoh), len(weightsforitoh[0])))
         prevGradientHtoO = currGradientHtoO
         currGradientHtoO = np.zeros((len(weightsforhtoO), len(weightsforhtoO[0])))
-        np.clip(initWeightItoH, 0.000001, 50)
-        np.clip(initWeightHtoO, 0.000001, 50)
+        np.clip(learingRateItoH, 0.0005, 0.001)
+        np.clip(learingRateHtoO, 0.0005, 0.001)
     
 
         print("Training accuracy of the system: ", (accuracy/len(data)), "%", accuracy)
         
 
 
-        # if fe == epoch-1:
-        #     np.random.shuffle(input_testing)
-        #     inputsTesting, trackTesting = zip(*input_testing)
-        #     accuracyTesting = 0
-        #     for t in range(len(inputsTesting)):
-        #         feedfor.feedforward(inputsTesting[t])
-        #         feedforwardoutput = feedfor.getOutputofOutputLayer()
-        #         maxValue = np.amax(feedforwardoutput)
-        #         digit = list(feedforwardoutput).index(maxValue)
-        #         excepted = list(Functions().getIncdices(trackTesting[t])).index(1)
-        #         if maxValue > 0.5000000000000: 
-        #             if digit == excepted:
-        #                 accuracyTesting += 1
-        #     print("Testing accuracy of the system: ", (accuracyTesting/len(inputsTesting)), "%", accuracyTesting)
+        if fe == epoch-1:
+            np.random.shuffle(input_testing)
+            inputsTesting, trackTesting = zip(*input_testing)
+            accuracyTesting = 0
+            for t in range(len(inputsTesting)):
+                feedfor.feedforward(inputsTesting[t])
+                feedforwardoutput = feedfor.getOutputofOutputLayer()
+                maxValue = np.amax(feedforwardoutput)
+                digit = list(feedforwardoutput).index(maxValue)
+                excepted = list(Functions().getIncdices(trackTesting[t])).index(1)
+                if maxValue > 0.5000000000000: 
+                    if digit == excepted:
+                        accuracyTesting += 1
+            print("Testing accuracy of the system: ", (accuracyTesting/len(inputsTesting)), "%", accuracyTesting)
         
 
 

@@ -16,7 +16,7 @@ class FeedForward(object):
 
     def feedforward(self, inputs):
         inputlayer = inputs
-        inputlayer = np.resize(inputlayer, (1, len(inputs)))
+        # inputlayer = np.resize(inputlayer, (1, len(inputs)))
         # dotproduct for summtation of input times the weight (inputlayer to hiddenlayer)
         dotproducth = np.dot(inputlayer, self.weightconnectionh)
         sumh = dotproducth + self.baish

@@ -78,18 +78,6 @@ def main():
         np.random.shuffle(input_data)
         data, track = zip(*input_data)
         
-        # test_data =np.split(np.asarray(data), k)
-        # test_track = np.split(np.asarray(track), k)
-        # print('Chucks: ', len(test_track), len(test_track))
-
-        # for i in range(k):
-        #     for j in range(k-1):
-        #     # go through training
-        #   if i == k-1: 
-        #     for z in range(1):
-        #     # collect the aveage 
-
-        
         accuracy = 0
         for e in range(len(data)):
             trackId = track[e]

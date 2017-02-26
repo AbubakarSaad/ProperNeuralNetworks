@@ -1,10 +1,10 @@
 from functions import Functions
 import numpy as np
 
-class Rprop(object):
+class Deltabar(object):
 
 
-    def __init__(self, gradientofHtoO, gradientofItoH):
+    def __init__(self, gradientofHtoO, gradientofItoH, learningRateofItoH, learningRateofHtoO):
         # self.biash = biash
         # self.biaso = biaso
         # self.deltabiaso = np.zeros(len(self.biaso))
@@ -13,9 +13,11 @@ class Rprop(object):
         # self.weightsOfItoH = weightsofItoH
         self.currgradientOfHtoO = gradientofHtoO
         self.currgradientOfItoH = gradientofItoH
+        self.learingRateofItoH = learningRateofItoH
+        self.learingRateofHtoO = learningRateofHtoO
         
         
-    def Respropagation(self, outputsofo, outputofh, error, weightsofHtoO, sample):
+    def Deltabardelta(self, outputsofo, outputofh, error, weightsofHtoO, sample):
         # local error at output 
         
         outo1neto1 = Functions().sigmoid(outputsofo, True)
@@ -53,18 +55,6 @@ class Rprop(object):
         # self.biash -= delta
         # self.deltabiash = delta
 
-
-    # def getOutputLayerError(self):
-    #     return self.weightsOfHtoO
-    
-    # def getHiddenLayerError(self):
-    #     return self.weightsOfItoH
-
-    # def getHiddenLayerBias(self):
-    #     return self.deltabiash
-    
-    # def getOutputLayerBias(self):
-    #     return self.deltabiaso
 
     def getGradientHtoO(self):
         return self.currgradientOfHtoO

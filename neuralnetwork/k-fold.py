@@ -15,11 +15,11 @@ from functions import Functions
 
 def main():
 
-    learningRate = 0.3
-    momentum = 0.1
-    epoch = 10
+    learningRate = 0.05
+    momentum = 0.01
+    epoch = 100
     weightconnectionstoH = 64
-    numberofHiddenNeuron = 40
+    numberofHiddenNeuron = 25
     numberofOutputNeuron = 10 
     sizeofBaish = numberofHiddenNeuron
     sizeofBaiso = numberofOutputNeuron
