@@ -12,7 +12,9 @@ class Functions():
             return x * (1 - x)
         return 1/(1 + np.exp(-(x)))
 
-    def tanh(self, x):
+    def tanh(self, x, derv=False):
+        if derv == True:
+            return 1 - (np.power(x,2))
         return (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
 
     def getIncdices(self, id):
