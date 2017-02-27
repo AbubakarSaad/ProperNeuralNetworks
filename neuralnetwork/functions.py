@@ -1,3 +1,4 @@
+import csv
 import math
 import numpy as np
 
@@ -57,3 +58,11 @@ class Functions():
             return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
         elif num == 9:
             return np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+
+    
+    def storeInFile(self, data, filename):
+        with open(filename, 'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            for line in data:
+                for singleline in line:
+                    writer.writerow(singleline)

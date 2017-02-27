@@ -6,7 +6,7 @@ from rprop import Rprop
 from functions import Functions
 
 
-def main():
+def main(runs):
 
     # learningRate = 0.1
     # momentum = 0.01
@@ -26,11 +26,6 @@ def main():
     dirlistingtraining = os.listdir(filepath)
     # print(dirlistingtraining)
 
-    # 0 - 9 are the test files and 10 - 19 are the training file
-    # np.random.seed(100)
-
-    # path = filepath + dirlistingtraining[random_file_num]
-    # inputs = np.loadtxt(path, delimiter=',', dtype='float')
     inputsTraining = []
     
     # print(inputsTraining[0])
@@ -40,9 +35,10 @@ def main():
         for j in range(len(inp)):
             inputsTraining.append(inp[j])
 
-    # k-fold cross validation
-
-    # hold out
+    dataList = []
+    Timesruns = 'Run: ' + str(runs)
+    dataList.append(Timesruns)
+    
     inputsTesting = []
     for i in range(0, len(dirlistingtraining) - 10): 
         path = filepath + dirlistingtraining[i]
@@ -83,7 +79,9 @@ def main():
         np.random.shuffle(input_data)
         data, track = zip(*input_data)
         
+        accuaryList = []
         accuracy = 0
+        
         for e in range(len(data)):
             trackId = track[e]
             feedfor.feedforward(data[e])
@@ -162,13 +160,17 @@ def main():
     
 
         print("Training accuracy of the system: ", (accuracy/len(data)), "%", accuracy)
-        
+        accuaryList.append(fe)
+        accuaryList.append(accuracy/len(data))
+        dataList.append(accuaryList)
 
 
         if fe == epoch-1:
             np.random.shuffle(input_testing)
             inputsTesting, trackTesting = zip(*input_testing)
             accuracyTesting = 0
+            accuaryListTesting = []
+
             for t in range(len(inputsTesting)):
                 feedfor.feedforward(inputsTesting[t])
                 feedforwardoutput = feedfor.getOutputofOutputLayer()
@@ -179,7 +181,17 @@ def main():
                     if digit == excepted:
                         accuracyTesting += 1
             print("Testing accuracy of the system: ", (accuracyTesting/len(inputsTesting)), "%", accuracyTesting)
-        
+            accuaryListTesting.append('Testing accuracy')
+            accuaryListTesting.append((accuracyTesting/len(inputsTesting)))
+            dataList.append(accuaryListTesting)
 
+    return dataList
 
-main()
+    
+if __name__ == "__main__":
+    storelist = []
+    filename = 'rprop.csv'
+    for i in range(2):
+        finallist = main(i)
+        storelist.append(finallist)
+    Functions().storeInFile(storelist, filename)

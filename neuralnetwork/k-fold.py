@@ -13,11 +13,11 @@ from functions import Functions
 
 
 
-def main():
+def main(runs):
 
     learningRate = 0.05
     momentum = 0.01
-    epoch = 100
+    epoch = 5
     weightconnectionstoH = 64
     numberofHiddenNeuron = 25
     numberofOutputNeuron = 10 
@@ -29,13 +29,13 @@ def main():
     # os.path.dirname gets the dir path for this file
     filepath = "c:\\Users\\Abu\\Documents\\ANN\\assignment1\\neuralnetwork\\a1digits\\"
     dirlistingtraining = os.listdir(filepath)
-    # print(dirlistingtraining)
+    
+    # Storing data for collection
+    dataList = []
+    Timesruns = 'Run: ' + str(runs)
+    dataList.append(Timesruns)
 
-    # 0 - 9 are the test files and 10 - 19 are the training file
-    # np.random.seed(100)
 
-    # path = filepath + dirlistingtraining[random_file_num]
-    # inputs = np.loadtxt(path, delimiter=',', dtype='float')
     inputsTraining = []
     
     # print(inputsTraining[0])
@@ -45,9 +45,7 @@ def main():
         for j in range(len(inp)):
             inputsTraining.append(inp[j])
 
-    # k-fold cross validation
 
-    # hold out
     inputsTesting = []
     for i in range(0, len(dirlistingtraining) - 10): 
         path = filepath + dirlistingtraining[i]
@@ -80,8 +78,8 @@ def main():
         
         test_data =np.split(np.asarray(data), k)
         test_track = np.split(np.asarray(track), k)
-        # print('Chucks: ', len(test_track), len(test_track))
-        
+        # Collection of data
+        accuaryList = []
         accuracyArr = []
 
         for i in range(k):
@@ -112,23 +110,26 @@ def main():
                         if maxValue > 0.5000000000000: 
                             if digit == excepted:
                                 accuracy += 1
-                # maxValue = np.amax(feedforwardoutput)
-                # digit = list(feedforwardoutput).index(maxValue)
-                # excepted = list(Functions().getIncdices(trackId)).index(1)
-                # if maxValue > 0.5000000000000: 
-                #     if digit == excepted:
-                #         accuracy += 1
             accuracyArr.append(accuracy/len(test_data[i]))
             print("Training accuracy of the system: ", accuracy)
         print('accuracy array', accuracyArr)
-
+        
+        accuaryList.append(fe)
+        accuaryList.append(accuracyArr)
         avgAccuacry = np.sum(accuracyArr)/k
         avgAccuarcyofEpoch.append(avgAccuacry)
+        accuaryList.append('avgAccuarcyofEpoch')
+        
+        accuaryList.append(avgAccuarcyofEpoch)
         print("avgAccuacryofEpoch: ", avgAccuarcyofEpoch)
+        dataList.append(accuaryList)
+
+
         if fe == epoch-1:
             np.random.shuffle(input_testing)
             inputsTesting, trackTesting = zip(*input_testing)
             accuracyTesting = 0
+            accuaryListTesting = []
             for t in range(len(inputsTesting)):
                 feedfor.feedforward(inputsTesting[t])
                 feedforwardoutput = feedfor.getOutputofOutputLayer()
@@ -139,8 +140,17 @@ def main():
                     if digit == excepted:
                         accuracyTesting += 1
             print("Testing accuracy of the system: ", (accuracyTesting/len(inputsTesting)), "%", accuracyTesting)
-        
+            accuaryListTesting.append('Testing accuracy')
+            accuaryListTesting.append((accuracyTesting/len(inputsTesting)))
+            dataList.append(accuaryListTesting)
+
+    return dataList
 
 
 if __name__ == "__main__":
-    main()
+    storelist = []
+    filename = 'k-fold.csv'
+    for i in range(2):
+        finallist = main(i)
+        storelist.append(finallist)
+    Functions().storeInFile(storelist, filename)

@@ -13,10 +13,10 @@ from functions import Functions
 
 
 
-def main():
+def main(runs):
 
-    learningRate = 0.3
-    momentum = 0.1
+    learningRate = 0.05
+    momentum = 0.01
     epoch = 10
     weightconnectionstoH = 64
     numberofHiddenNeuron = 40
@@ -45,8 +45,11 @@ def main():
         for j in range(len(inp)):
             inputsTraining.append(inp[j])
 
-    # k-fold cross validation
+    dataList = []
+    Timesruns = 'Run: ' + str(runs)
+    dataList.append(Timesruns)
 
+    
     # hold out
     inputsTesting = []
     for i in range(0, len(dirlistingtraining) - 10): 
@@ -61,6 +64,8 @@ def main():
     track = [i for i in range(0, len(inputsTraining))]
     input_data = list(zip(data, track))
     input_testing = list(zip(inputsTraining, trackTesting))
+    
+    
     
     # number of weights connections from inputs, number of hidden neurons, output weight connections and number of output neuron
     weightsforh = np.random.uniform(-0.5, 0.5, size=(weightconnectionstoH, numberofHiddenNeuron))
@@ -77,7 +82,8 @@ def main():
         print('\nEpoch number: ', fe)
         np.random.shuffle(input_data)
         data, track = zip(*input_data)
-        
+        # collecting data to store in file
+        accuaryList = []
         accuracy = 0
         for e in range(len(data)):
             trackId = track[e]
@@ -103,10 +109,14 @@ def main():
                     accuracy += 1
         print("Training accuracy of the system: ", (accuracy/len(data)), "%", accuracy)
 
+        accuaryList.append(fe)
+        accuaryList.append(accuracy/len(data))
+        dataList.append(accuaryList)
         if fe == epoch-1:
             np.random.shuffle(input_testing)
             inputsTesting, trackTesting = zip(*input_testing)
             accuracyTesting = 0
+            accuaryListTesting = []
             for t in range(len(inputsTesting)):
                 feedfor.feedforward(inputsTesting[t])
                 feedforwardoutput = feedfor.getOutputofOutputLayer()
@@ -117,8 +127,19 @@ def main():
                     if digit == excepted:
                         accuracyTesting += 1
             print("Testing accuracy of the system: ", (accuracyTesting/len(inputsTesting)), "%", accuracyTesting)
-        
+            accuaryListTesting.append('Testing accuracy')
+            accuaryListTesting.append((accuracyTesting/len(inputsTesting)))
+            dataList.append(accuaryListTesting)
+
+    return dataList
+
 
 
 if __name__ == "__main__":
-    main()
+   
+    storelist = []
+    filename = 'hold-out.csv'
+    for i in range(2):
+        finallist = main(i)
+        storelist.append(finallist)
+    Functions().storeInFile(storelist, filename)
