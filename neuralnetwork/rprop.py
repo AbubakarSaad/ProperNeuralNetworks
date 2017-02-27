@@ -5,30 +5,23 @@ class Rprop(object):
 
 
     def __init__(self, gradientofHtoO, gradientofItoH):
-        # self.biash = biash
-        # self.biaso = biaso
-        # self.deltabiaso = np.zeros(len(self.biaso))
-        # self.weightsOfHtoO = weightsofHtoO
-        # self.deltabiash = np.zeros(len(self.biash))
-        # self.weightsOfItoH = weightsofItoH
         self.currgradientOfHtoO = gradientofHtoO
         self.currgradientOfItoH = gradientofItoH
         
         
     def Respropagation(self, outputsofo, outputofh, error, weightsofHtoO, sample):
-        # local error at output 
         
+        # error at output 
         outo1neto1 = Functions().sigmoid(outputsofo, True)
         erroratoutputlayer = outo1neto1 * error
         
-        # print("hello",outputofh)
-        # print(outputofh)
+        # resizing and reshaping for dot product
         erroutputlayer = np.reshape(erroratoutputlayer, (-1, 1))
         tempOutputofh = np.resize(outputofh, (1,len(outputofh)))
-        # current gradient at Hidden Layer to Output Layer
-        # print(erroratoutputlayer.T)
-        # print(self.currgradientOfHtoO)
-        # gradientOfHtoO =  np.dot(erroratoutputlayer.T, outputofh)
+        
+        # Instead of applying double for loops, using matrix and dot product to calculate gradient 
+        # This inceases the efficieny of the program by a factor of 10
+        # gradient at Hidden Layer to Output Layer
         gradientOfHtoO = np.dot(erroutputlayer, tempOutputofh).T
         self.currgradientOfHtoO = gradientOfHtoO
         
@@ -38,36 +31,19 @@ class Rprop(object):
         bi = Functions().sigmoid(outputofh, True)
         errorHiddenLayer = errorContr * bi
 
-       
+        # same concept as from hidden to output layer 
         errHiddenLayer = np.reshape(errorHiddenLayer, (-1, 1))
         tempSample = np.resize(sample, (1, len(sample)))
-        # current gradient of Input layer to Hidden Layer
-        # gradientOfItoH =  np.dot(errHiddenLayer, tempSample).T
-        # gradientOfItoH = np.dot(errorHiddenLayer.T, tempSample)
+        
+        #gradient of Input layer to Hidden Layer
         gradientOfItoH = np.dot(errHiddenLayer, tempSample).T
         self.currgradientOfItoH = gradientOfItoH
 
-        
-        # updating the bias
-        # delta = learningRate * errorHiddenLayer
-        # self.biash -= delta
-        # self.deltabiash = delta
-
-
-    # def getOutputLayerError(self):
-    #     return self.weightsOfHtoO
     
-    # def getHiddenLayerError(self):
-    #     return self.weightsOfItoH
-
-    # def getHiddenLayerBias(self):
-    #     return self.deltabiash
-    
-    # def getOutputLayerBias(self):
-    #     return self.deltabiaso
-
+    # returns the gradient for hidden to output layer
     def getGradientHtoO(self):
         return self.currgradientOfHtoO
     
+    # returns the gradient from input to hidden layer
     def getGradientItoH(self):
         return self.currgradientOfItoH

@@ -16,20 +16,23 @@ class Backprop(object):
         self.weightsOfItoH = weightsofItoH        
 
     def backpropagation(self, outputsofo, outputofh, error, weightsofHtoO, learningRate, sample, weightsofItoH):
-        # local error at output 
         
+        # error at output 
         outo1neto1 = Functions().sigmoid(outputsofo, True)
         erroratoutputlayer = np.multiply(outo1neto1, error)
         
         
         erroutputlayer = np.reshape(erroratoutputlayer, (-1, 1))
         tempOutputofh = np.resize(outputofh, (1,len(outputofh)))
+        
+        # Instead of applying double for loops, using matrix and dot product to calculate delta (change for weights)
+        # This inceases the efficieny of the program by a factor of 10
         deltao = learningRate * np.dot(erroutputlayer, tempOutputofh).T
         deltaMomentum = self.momentum * self.deltaArrayOutput
         self.weightsOfHtoO -= (deltao + deltaMomentum)
         self.deltaArrayOutput = deltao
         
-        # print('deltaAarrayoutput', self.deltaArrayOutput)
+        # For loops are much slower 
         # for i in range(len(weightsofHtoO[0])):
         #     for j in range(len(weightsofHtoO)):
         #         delta = erroratoutputlayer[i]*outputofh[j]*learningRate
@@ -37,10 +40,11 @@ class Backprop(object):
         #         self.deltaArrayOutput[j][i] = delta
         
 
+        # updating the bias of hidden to output
         deltaob = learningRate * erroratoutputlayer
         self.biaso -= deltaob
         self.deltabiaso = deltaob
-        # updating the bias
+        
         # for i in range(len(self.biaso)):
         #     delta = learningRate * erroratoutputlayer[i]
         #     self.biaso[i] -= delta
@@ -51,7 +55,7 @@ class Backprop(object):
         bi = Functions().sigmoid(outputofh, True)
         errorHiddenLayer = np.multiply(errorContr, bi)
 
-        
+        # same concepts as above
         errHiddenLayer = np.reshape(errorHiddenLayer, (-1, 1))
         tempSample = np.resize(sample, (1, len(sample)))
         deltah = learningRate * np.dot(errHiddenLayer, tempSample).T
@@ -65,7 +69,7 @@ class Backprop(object):
         #         self.weightsOfItoH[j][i] -= (delta + self.deltaArrayHidden[j][i] * self.momentum)
         #         self.deltaArrayHidden[j][i] = delta
         
-        # updating the bias
+        # updating the bias of input to hidden weights
         deltaoh = learningRate * errorHiddenLayer
         self.biash -= deltaoh
         self.deltabiash = deltaoh
@@ -74,14 +78,17 @@ class Backprop(object):
         #     self.biash[i] -= delta
         #     self.deltabiash = delta
     
+    # Return the new weights of hidden to output
     def getOutputLayerError(self):
         return self.weightsOfHtoO
-    
+   
+    # Return the new weights of Input to hidden
     def getHiddenLayerError(self):
         return self.weightsOfItoH
 
+    # Return updated bias for hidden to output weights
     def getHiddenLayerBias(self):
         return self.deltabiash
-    
+    # Return updated bias for input to hidden weights
     def getOutputLayerBias(self):
         return self.deltabiaso

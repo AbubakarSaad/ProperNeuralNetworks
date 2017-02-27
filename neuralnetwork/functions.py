@@ -4,17 +4,18 @@ import numpy as np
 
 class Functions():
 
-    def dotproduct(self, inputs, weights):
-        return np.dot(inputs, weights)
-
+    # sigmoid activation function
     def sigmoid(self, x, derv=False):
         if derv == True:
             return x * (1 - x)
         return 1/(1 + np.exp(-(x)))
-
-    def tanh(self, x):
+    # Tanh activation function
+    def tanh(self, x, derv=False):
+        if derv == True:
+            return 1 - (np.power(x, 2))
         return (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
 
+    # This function helps calculate the error by tracking index of input training array
     def getIncdices(self, id):
         if math.floor(id / 700) == 0:
             return np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -36,7 +37,7 @@ class Functions():
             return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
         elif math.floor(id / 700) == 9:
             return np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
-
+    # This function helps with mean squared errors
     def getErrorResult(self, num):
         if  num == 0:
             return np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -59,7 +60,7 @@ class Functions():
         elif num == 9:
             return np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
 
-    
+    # Stores Results in a csv file
     def storeInFile(self, data, filename):
         with open(filename, 'w') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
