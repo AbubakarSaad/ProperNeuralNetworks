@@ -1,4 +1,3 @@
-from neuronlayer import NeuronLayer
 from functions import Functions
 import numpy as np
 

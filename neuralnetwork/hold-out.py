@@ -1,41 +1,32 @@
 import math
 import numpy as np
 import os as os
-from neuronlayer import NeuronLayer
+import glob
 from feedforward import FeedForward
 from backprop import Backprop
 from functions import Functions
 
 
-# validation
-# k-fold
-
-
-
-
 def main(runs):
 
+    # NN parameters
     learningRate = 0.05
     momentum = 0.01
-    epoch = 10
+    epoch = 1
     weightconnectionstoH = 64
     numberofHiddenNeuron = 40
     numberofOutputNeuron = 10 
     sizeofBaish = numberofHiddenNeuron
     sizeofBaiso = numberofOutputNeuron
-    k = 10
+    
 
     # opening a file
     # os.path.dirname gets the dir path for this file
     filepath = "c:\\Users\\Abu\\Documents\\ANN\\assignment1\\neuralnetwork\\a1digits\\"
+    # print(os.path.dirname(__file__))
     dirlistingtraining = os.listdir(filepath)
     # print(dirlistingtraining)
-
-    # 0 - 9 are the test files and 10 - 19 are the training file
-    # np.random.seed(100)
-
-    # path = filepath + dirlistingtraining[random_file_num]
-    # inputs = np.loadtxt(path, delimiter=',', dtype='float')
+    # storing all the training samples
     inputsTraining = []
     
     # print(inputsTraining[0])
